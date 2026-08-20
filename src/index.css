@@ -1,12 +1,21 @@
 @import "tailwindcss";
 
+:root {
+  --primary: #66c0f4;
+  --secondary: #2a475e;
+  --tertiary: #1b2838;
+  --neutral: #171a21;
+  --accent-green: #76b82a;
+  --accent-green-hover: #65a30d;
+}
+
 @theme {
-  --color-gamer-neutral: #171a21;
-  --color-gamer-tertiary: #1b2838;
-  --color-gamer-secondary: #2a475e;
-  --color-gamer-primary: #66c0f4;
-  --color-gamer-green: #76b82a;
-  --color-gamer-green-hover: #65a30d;
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-neutral: var(--neutral);
+  --color-accent-green: var(--accent-green);
+  --color-accent-green-hover: var(--accent-green-hover);
 }
 
 body {

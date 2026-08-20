@@ -2,7 +2,7 @@ import React from "react";
 
 const BannerGames = ({ onExplorarClick }) => {
   return (
-    <section className="relative w-full rounded-3xl overflow-hidden shadow-2xl mb-12 border border-slate-800 bg-[#171a21]">
+    <section className="relative w-full rounded-3xl overflow-hidden shadow-2xl mb-12 border border-secondary/40 bg-neutral">
       {/* Contenedor de la imagen de fondo con degradados oscuros */}
       <div className="relative min-h-[380px] sm:min-h-[460px] w-full flex items-center">
         <img
@@ -12,14 +12,14 @@ const BannerGames = ({ onExplorarClick }) => {
         />
 
         {/* Degradado oscuro lateral y de fondo idéntico al mockup */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#171a21] via-[#171a21]/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#171a21] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-neutral via-neutral/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-neutral via-transparent to-transparent" />
 
         {/* Contenido textual del Hero Banner */}
         <div className="relative z-10 px-6 sm:px-12 py-10 max-w-2xl">
           <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-tight text-white leading-tight mb-3">
             EL MUNDO GAMER <br />
-            <span className="text-[#76b82a]">TE ESPERA</span>
+            <span className="text-accent-green">TE ESPERA</span>
           </h1>
 
           <p className="text-slate-300 text-base sm:text-xl font-medium mb-8 max-w-md">
@@ -28,7 +28,7 @@ const BannerGames = ({ onExplorarClick }) => {
 
           <button
             onClick={onExplorarClick}
-            className="inline-block bg-[#76b82a] hover:bg-[#65a30d] text-white font-bold uppercase text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-lg shadow-[#76b82a]/30 transition duration-300 transform hover:-translate-y-0.5"
+            className="inline-block bg-accent-green hover:bg-accent-green-hover text-white font-bold uppercase text-sm sm:text-base px-8 py-3.5 rounded-xl shadow-lg shadow-accent-green/30 transition duration-300 transform hover:-translate-y-0.5"
           >
             EXPLORAR CATÁLOGO
           </button>
