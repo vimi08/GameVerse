@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+@theme {
+  --color-gamer-neutral: #171a21;
+  --color-gamer-tertiary: #1b2838;
+  --color-gamer-secondary: #2a475e;
+  --color-gamer-primary: #66c0f4;
+  --color-gamer-green: #76b82a;
+  --color-gamer-green-hover: #65a30d;
+}
+
+body {
+  background-color: #171a21;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
