@@ -19,7 +19,25 @@ import ProtectorRutas from "./components/routes/ProtectorRutas";
 // React Router
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// React Hooks
+import React, { useState, useEffect } from "react";
+
 function App() {
+
+const getUsuario = () => JSON.parse(sessionStorage.getItem("usuarioKey")) || false;
+  const getServicios = () => JSON.parse(localStorage.getItem("serviciosKey")) || [];
+
+  const [usuarioLogueado, setUsuarioLogueado] = useState(getUsuario);
+  const [servicios, setServicios] = useState(getServicios);
+
+  useEffect(() => {
+    sessionStorage.setItem("usuarioKey", JSON.stringify(usuarioLogueado));
+  }, [usuarioLogueado]);
+
+  useEffect(() => {
+    localStorage.setItem("serviciosKey", JSON.stringify(servicios));
+  }, [servicios]);
+  
   return (
     <AppProvider>
       <BrowserRouter>
