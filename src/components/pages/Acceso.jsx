@@ -23,40 +23,68 @@ export default function Acceso() {
         toast: true,
         position: "top-end",
         icon: "success",
-        title: "Bienvenido",
-        text: "Estas ingresndo a tu panel de control",
+        title: "Bienvenido Admin",
+        text: "Ingresando a tu panel de control",
         showConfirmButton: false,
         timer: 2000,
-        timerProgressBar: true,
         background: "#171a21",
         color: "#fff",
-        customClass: {
-          popup: "rounded-lg text-xs shadow-lg",
-          title: "text-sm font-semibold",
-          htmlContainer: "text-xs",
-        },
       });
       setUser({ email: data.email, rol: "admin" });
       navigate("/admin");
-    } else {
+      return;
+    }
+
+    // 2. Validar usuarios invitados registrados
+    const usuarios = JSON.parse(localStorage.getItem("usuariosKey")) || [];
+    const usuarioEncontrado = usuarios.find(
+      (u) => u.email === data.email && u.password === data.password,
+    );
+
+    if (usuarioEncontrado) {
       Swal.fire({
         toast: true,
         position: "top-end",
-        icon: "error",
-        title: "Error",
-        text: "Credenciales incorrectas",
+        icon: "success",
+        title: "Bienvenido",
+        text: "Has iniciado sesión correctamente",
         showConfirmButton: false,
-        timer: 2500,
-        timerProgressBar: true,
+        timer: 2000,
         background: "#171a21",
         color: "#fff",
-        customClass: {
-          popup: "rounded-lg text-xs shadow-lg",
-          title: "text-sm font-semibold",
-          htmlContainer: "text-xs",
-        },
       });
+      setUser({ email: usuarioEncontrado.email, rol: "invitado" });
+      navigate("/");
+      return;
     }
+    // 3. Si no coincide con ninguno → redirigir a registro
+    Swal.fire({
+      icon: "error",
+      title: "Ups, no pudimos encontrarte",
+      text: "¿Quieres tener tu propia cuenta?",
+      background: "#171a21",
+      color: "#e5e7eb",
+      width: "320px",
+      showCancelButton: true,
+      confirmButtonText: "Vamos a crearla !",
+      cancelButtonText: "No por el momento",
+      buttonsStyling: false,
+      customClass: {
+        popup:
+          "rounded-lg shadow-lg border border-primary/30 p-4 sm:p-6 max-w-xs sm:max-w-sm md:max-w-md",
+        title: "text-lg font-bold text-primary tracking-wide",
+        htmlContainer: "mt-2 text-xs sm:text-sm text-gray-300",
+        actions: "flex justify-between w-full gap-4 mt-4",
+        confirmButton:
+          "px-3 py-2 text-xs sm:text-sm font-semibold rounded-md shadow-md bg-green-600 hover:bg-green-700 text-white",
+        cancelButton:
+          "px-3 py-2 text-xs sm:text-sm font-semibold rounded-md shadow-md bg-gray-500 hover:bg-gray-600 text-white",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate("/registro");
+      }
+    });
   };
   return (
     <div
@@ -92,6 +120,7 @@ export default function Acceso() {
               id="email"
               type="text"
               placeholder="Ej: correo@gmail.com"
+              autoComplete="off"
               className="mt-2 block w-full rounded-md bg-neutral px-4 py-3 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-primary focus:outline-none transition"
               {...register("email", {
                 required: "Tu correo es la llave de acceso",
@@ -120,6 +149,7 @@ export default function Acceso() {
             id="password"
             type="password"
             placeholder="••••••••"
+            autoComplete="new-password"
             className="mt-2 block w-full rounded-md bg-neutral px-4 py-3 text-white placeholder:text-gray-500 focus:ring-2 focus:ring-primary focus:outline-none transition"
             {...register("password", {
               required: "Tu contraseña es tu escudo",
