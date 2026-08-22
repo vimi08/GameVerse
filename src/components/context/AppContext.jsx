@@ -1,11 +1,22 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 export const AppContext = createContext(undefined);
-
 export function AppProvider({ children }) {
-  // Estado global para compartir
-  const [user, setUser] = useState(null);
-  const [wishlist, setWishlist] = useState([]);
+  const getUsuario = () =>
+    JSON.parse(sessionStorage.getItem("usuarioKey")) || null;
+  const [user, setUser] = useState(getUsuario);
+
+  useEffect(() => {
+    sessionStorage.setItem("usuarioKey", JSON.stringify(user));
+  }, [user]);
+
+  const getWishlist = () =>
+    JSON.parse(localStorage.getItem("wishlistKey")) || [];
+  const [wishlist, setWishlist] = useState(getWishlist);
+
+  useEffect(() => {
+    localStorage.setItem("wishlistKey", JSON.stringify(wishlist));
+  }, [wishlist]);
 
   const value = {
     user,
@@ -14,13 +25,8 @@ export function AppProvider({ children }) {
     setWishlist,
   };
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
-
 export function useAppContext() {
   const context = useContext(AppContext);
   if (!context) {
