@@ -1,30 +1,51 @@
 import { createContext, useContext, useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 export const AppContext = createContext(undefined);
+
 export function AppProvider({ children }) {
-  const getUsuario = () =>
-    JSON.parse(sessionStorage.getItem("usuarioKey")) || null;
-  const [user, setUser] = useState(getUsuario);
+  const navigate = useNavigate();
+  const safeParse = (key, fallback) => {
+    try {
+      return JSON.parse(sessionStorage.getItem(key)) || fallback;
+    } catch {
+      return fallback;
+    }
+  };
+  const safeParseLocal = (key, fallback) => {
+    try {
+      return JSON.parse(localStorage.getItem(key)) || fallback;
+    } catch {
+      return fallback;
+    }
+  };
+  const [user, setUser] = useState(() => safeParse("usuarioKey", null));
 
   useEffect(() => {
-    sessionStorage.setItem("usuarioKey", JSON.stringify(user));
+    if (user !== null) {
+      sessionStorage.setItem("usuarioKey", JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem("usuarioKey");
+    }
   }, [user]);
-
-  const getWishlist = () =>
-    JSON.parse(localStorage.getItem("wishlistKey")) || [];
-  const [wishlist, setWishlist] = useState(getWishlist);
+  const [wishlist, setWishlist] = useState(() =>
+    safeParseLocal("wishlistKey", []),
+  );
 
   useEffect(() => {
     localStorage.setItem("wishlistKey", JSON.stringify(wishlist));
   }, [wishlist]);
-
+  const logout = (redirect = "/") => {
+    sessionStorage.removeItem("usuarioKey");
+    setUser(null);
+    navigate(redirect);
+  };
   const value = {
     user,
     setUser,
     wishlist,
     setWishlist,
+    logout,
   };
-
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
 export function useAppContext() {
