@@ -20,14 +20,43 @@ const gameData = {
   price: 27999,
   rating: 4.8,
   reviewsCount: 1250,
+  description:
+    "Kratos y Atreus se embarcan en un viaje mítico en busca de respuestas antes del Ragnarök. Explorá los nueve reinos, enfrentate a dioses y monstruos nórdicos en batallas épicas.",
+  features: [
+    "Viajá a través de increíbles paisajes nórdicos",
+    "Enfrentamientos épicos contra enemigos legendarios",
+    "Mejorás tus habilidades y armamento",
+  ],
+  requisitos: {
+    minimos: [
+      ["Sistema operativo", "Windows 10 64-bit"],
+      ["Procesador", "Intel i5-2500K / AMD Ryzen 3 1200"],
+      ["Memoria", "8 GB RAM"],
+      ["Gráficos", "GTX 960 / RX 470"],
+      ["Almacenamiento", "70 GB disponibles"],
+    ],
+    recomendados: [
+      ["Sistema operativo", "Windows 11 64-bit"],
+      ["Procesador", "Intel i5-6600K / AMD Ryzen 5 2400G"],
+      ["Memoria", "8 GB RAM"],
+      ["Gráficos", "GTX 1060 6GB / RX 570 4GB"],
+      ["Almacenamiento", "70 GB disponibles (SSD recomendado)"],
+    ],
+  },
 };
 
 const currency = (n) => n.toLocaleString("es-AR", { minimumFractionDigits: 0 });
+
+const TABS = [
+  { id: "descripcion", label: "Descripción" },
+  { id: "requisitos", label: "Requisitos del sistema" },
+];
 
 const DetalleJuego = () => {
   const navigate = useNavigate();
   const game = gameData;
 
+  const [activeTab, setActiveTab] = useState("descripcion");
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [cartStatus, setCartStatus] = useState("idle"); // idle | added
 
@@ -127,6 +156,66 @@ const DetalleJuego = () => {
               {game.releaseDate}
             </p>
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="border-t border-white/10 px-6">
+          <div className="flex gap-6 overflow-x-auto">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-3 whitespace-nowrap text-sm font-semibold border-b-2 transition-colors ${
+                  activeTab === tab.id
+                    ? "border-green-500 text-green-400"
+                    : "border-transparent text-gray-400 hover:text-gray-200"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Contenido de tabs */}
+        <div className="px-6 py-6">
+          {activeTab === "descripcion" && (
+            <div className="max-w-3xl">
+              <p className="text-gray-300 leading-relaxed">{game.description}</p>
+              <h3 className="text-green-400 font-semibold mt-5 mb-3">
+                Características:
+              </h3>
+              <ul className="space-y-2">
+                {game.features.map((f, i) => (
+                  <li key={i} className="flex items-start gap-2 text-gray-200">
+                    <FaCheck className="text-green-500 mt-1 shrink-0" size={12} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {activeTab === "requisitos" && (
+            <div className="grid sm:grid-cols-2 gap-6">
+              {[
+                ["Requisitos mínimos", game.requisitos.minimos],
+                ["Requisitos recomendados", game.requisitos.recomendados],
+              ].map(([title, rows]) => (
+                <div key={title} className="border border-white/10 rounded-xl p-4">
+                  <h3 className="font-semibold mb-3 text-white">{title}</h3>
+                  <dl className="space-y-2 text-sm">
+                    {rows.map(([label, value]) => (
+                      <div key={label} className="flex justify-between gap-4">
+                        <dt className="text-gray-400">{label}</dt>
+                        <dd className="text-gray-200 text-right">{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
