@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   FaStar,
@@ -6,6 +6,8 @@ import {
   FaHeart,
   FaRegHeart,
   FaCheck,
+  FaThumbsUp,
+  FaRegCommentAlt,
   FaTimes,
   FaChevronRight,
 } from "react-icons/fa";
@@ -18,8 +20,6 @@ const gameData = {
   developer: "Santa Monica Studio",
   releaseDate: "09 Nov, 2022",
   price: 27999,
-  rating: 4.8,
-  reviewsCount: 1250,
   description:
     "Kratos y Atreus se embarcan en un viaje mítico en busca de respuestas antes del Ragnarök. Explorá los nueve reinos, enfrentate a dioses y monstruos nórdicos en batallas épicas.",
   features: [
@@ -45,11 +45,74 @@ const gameData = {
   },
 };
 
+const initialDistribution = { 5: 1125, 4: 75, 3: 25, 2: 12, 1: 13 };
+
+const initialReviews = [
+  {
+    id: 1,
+    name: "LucasFer",
+    avatarColor: "#3b82f6",
+    rating: 5,
+    date: "Hace 2 días",
+    comment: "Un juegazo! Gráficos impresionantes y una historia increíble.",
+    likes: 12,
+    comments: 3,
+  },
+];
+
 const currency = (n) => n.toLocaleString("es-AR", { minimumFractionDigits: 0 });
+
+// Estrellas: soporta valores decimales (ej. 4.8), calculando el relleno
+// estrella por estrella (evita bugs de relleno con ratings bajos).
+const StarRating = ({ value, size = 16 }) => {
+  const safeValue = Math.max(0, Math.min(5, value || 0));
+  return (
+    <div className="flex gap-0.5" style={{ fontSize: size, lineHeight: 0 }}>
+      {[...Array(5)].map((_, i) => {
+        const fill = Math.max(0, Math.min(1, safeValue - i)) * 100;
+        return (
+          <span key={i} className="relative inline-block shrink-0">
+            <FaStar className="text-gray-700" />
+            <span
+              className="absolute inset-0 overflow-hidden text-[#f5b301]"
+              style={{ width: `${fill}%` }}
+            >
+              <FaStar />
+            </span>
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
+// Selector de estrellas clickeable, usado al escribir una reseña
+const StarInput = ({ value, onChange }) => {
+  const [hover, setHover] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <button
+          type="button"
+          key={n}
+          onClick={() => onChange(n)}
+          onMouseEnter={() => setHover(n)}
+          onMouseLeave={() => setHover(0)}
+          className="text-xl transition-colors"
+          style={{ color: n <= (hover || value) ? "#f5b301" : "#4b5563" }}
+          aria-label={`${n} estrellas`}
+        >
+          <FaStar />
+        </button>
+      ))}
+    </div>
+  );
+};
 
 const TABS = [
   { id: "descripcion", label: "Descripción" },
   { id: "requisitos", label: "Requisitos del sistema" },
+  { id: "resenas", label: "Reseñas" },
 ];
 
 const DetalleJuego = () => {
@@ -60,9 +123,70 @@ const DetalleJuego = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [cartStatus, setCartStatus] = useState("idle"); // idle | added
 
+  const [distribution, setDistribution] = useState(initialDistribution);
+  const [reviews, setReviews] = useState(initialReviews);
+  const [likedReviews, setLikedReviews] = useState(new Set());
+
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState("");
+
+  const totalReviews = useMemo(
+    () => Object.values(distribution).reduce((a, b) => a + b, 0),
+    [distribution]
+  );
+
+  const average = useMemo(() => {
+    const sum = Object.entries(distribution).reduce(
+      (acc, [stars, count]) => acc + Number(stars) * count,
+      0
+    );
+    return totalReviews ? sum / totalReviews : 0;
+  }, [distribution, totalReviews]);
+
   const handleAddToCart = () => {
     setCartStatus("added");
     setTimeout(() => setCartStatus("idle"), 1800);
+  };
+
+  const toggleLike = (id) => {
+    setLikedReviews((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+    setReviews((prev) =>
+      prev.map((r) =>
+        r.id === id
+          ? { ...r, likes: r.likes + (likedReviews.has(id) ? -1 : 1) }
+          : r
+      )
+    );
+  };
+
+  const handleSubmitReview = (e) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+
+    const review = {
+      id: Date.now(),
+      name: "Tú",
+      avatarColor: "#22c55e",
+      rating: newRating,
+      date: "Ahora",
+      comment: newComment.trim(),
+      likes: 0,
+      comments: 0,
+    };
+
+    setReviews((prev) => [review, ...prev]);
+    setDistribution((prev) => ({
+      ...prev,
+      [newRating]: prev[newRating] + 1,
+    }));
+    setNewComment("");
+    setNewRating(5);
+    setShowReviewForm(false);
   };
 
   return (
@@ -97,9 +221,9 @@ const DetalleJuego = () => {
           <h1 className="text-3xl font-bold">{game.title}</h1>
 
           <div className="flex items-center gap-2 mt-2">
-            <FaStar className="text-[#f5b301]" />
-            <span className="text-gray-300 text-sm">
-              {game.rating} ({game.reviewsCount.toLocaleString("es-AR")} reseñas)
+            <StarRating value={average} />
+            <span className="text-gray-400 text-sm">
+              {average.toFixed(1)} ({totalReviews.toLocaleString("es-AR")} reseñas)
             </span>
           </div>
 
@@ -172,6 +296,7 @@ const DetalleJuego = () => {
                 }`}
               >
                 {tab.label}
+                {tab.id === "resenas" && ` (${totalReviews.toLocaleString("es-AR")})`}
               </button>
             ))}
           </div>
@@ -214,6 +339,122 @@ const DetalleJuego = () => {
                   </dl>
                 </div>
               ))}
+            </div>
+          )}
+
+          {activeTab === "resenas" && (
+            <div>
+              <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
+                <h3 className="text-lg font-semibold">Reseñas de usuarios</h3>
+                <button
+                  onClick={() => setShowReviewForm((v) => !v)}
+                  className="border border-white/25 hover:bg-white/5 transition-colors rounded-lg px-4 py-2 text-sm font-semibold uppercase"
+                >
+                  Escribir reseña
+                </button>
+              </div>
+
+              <div className="grid sm:grid-cols-[auto_1fr] gap-6 mb-6">
+                <div className="text-center sm:text-left">
+                  <p className="text-4xl font-bold">{average.toFixed(1)}</p>
+                  <StarRating value={average} size={16} />
+                  <p className="text-gray-400 text-sm mt-1">
+                    {totalReviews.toLocaleString("es-AR")} reseñas
+                  </p>
+                </div>
+                <div className="flex flex-col justify-center gap-1.5">
+                  {[5, 4, 3, 2, 1].map((stars) => {
+                    const count = distribution[stars];
+                    const pct = totalReviews
+                      ? Math.round((count / totalReviews) * 100)
+                      : 0;
+                    return (
+                      <div key={stars} className="flex items-center gap-2 text-sm">
+                        <span className="w-3 text-gray-400">{stars}</span>
+                        <FaStar className="text-[#f5b301]" size={11} />
+                        <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-green-500 rounded-full"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className="w-9 text-gray-400 text-right">{pct}%</span>
+                        <span className="w-12 text-gray-500 text-right">
+                          ({count})
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {showReviewForm && (
+                <form
+                  onSubmit={handleSubmitReview}
+                  className="border border-white/10 rounded-xl p-4 mb-6 space-y-3"
+                >
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Tu puntuación</p>
+                    <StarInput value={newRating} onChange={setNewRating} />
+                  </div>
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Contanos qué te pareció el juego..."
+                    rows={3}
+                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm outline-none focus:border-green-500 transition-colors resize-none"
+                  />
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowReviewForm(false)}
+                      className="px-4 py-2 text-sm text-gray-400 hover:text-white"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-green-600 hover:bg-green-500 transition-colors px-4 py-2 rounded-lg text-sm font-semibold"
+                    >
+                      Publicar
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              <div className="space-y-5">
+                {reviews.map((r) => (
+                  <div key={r.id} className="border-b border-white/10 pb-4">
+                    <div className="flex items-center gap-3 mb-1.5">
+                      <div
+                        className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
+                        style={{ background: r.avatarColor }}
+                      >
+                        {r.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm">{r.name}</p>
+                        <StarRating value={r.rating} size={12} />
+                      </div>
+                    </div>
+                    <p className="text-gray-300 text-sm mb-2">{r.comment}</p>
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <span>{r.date}</span>
+                      <button
+                        onClick={() => toggleLike(r.id)}
+                        className={`flex items-center gap-1 hover:text-gray-300 transition-colors ${
+                          likedReviews.has(r.id) ? "text-green-400" : ""
+                        }`}
+                      >
+                        <FaThumbsUp size={11} /> {r.likes}
+                      </button>
+                      <span className="flex items-center gap-1">
+                        <FaRegCommentAlt size={11} /> {r.comments}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
