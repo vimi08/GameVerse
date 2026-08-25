@@ -11,6 +11,9 @@ import {
   FaTimes,
   FaChevronRight,
 } from "react-icons/fa";
+import gow1 from "../../assets/juego/god_of_war_1.avif";
+import gow2 from "../../assets/juego/god_of_war_2.jpg";
+import gow3 from "../../assets/juego/god_of_war_3.jpg";
 
 // Datos de ejemplo. Reemplazá esto por los datos reales del juego
 // (por ejemplo obtenidos por fetch/useParams cuando conectes tu API/backend).
@@ -20,6 +23,7 @@ const gameData = {
   developer: "Santa Monica Studio",
   releaseDate: "09 Nov, 2022",
   price: 27999,
+  images: [gow1, gow2, gow3],
   description:
     "Kratos y Atreus se embarcan en un viaje mítico en busca de respuestas antes del Ragnarök. Explorá los nueve reinos, enfrentate a dioses y monstruos nórdicos en batallas épicas.",
   features: [
@@ -120,6 +124,7 @@ const DetalleJuego = () => {
   const game = gameData;
 
   const [activeTab, setActiveTab] = useState("descripcion");
+  const [mainImage, setMainImage] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [cartStatus, setCartStatus] = useState("idle"); // idle | added
 
@@ -190,8 +195,8 @@ const DetalleJuego = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-gray-100 py-6 px-4">
-      <div className="max-w-6xl mx-auto bg-[#111114] border border-white/10 rounded-2xl overflow-hidden">
+    <div className="min-h-screen bg-[#0a0a0c] text-gray-100 py-6 px-4 sm:px-6 lg:px-10">
+      <div className="max-w-[1800px] mx-auto bg-[#111114] border border-white/10 rounded-2xl overflow-hidden">
         {/* Header: breadcrumb + cerrar */}
         <div className="flex items-start justify-between px-6 pt-5">
           <nav className="text-sm text-gray-400 flex items-center gap-2 flex-wrap">
@@ -216,69 +221,98 @@ const DetalleJuego = () => {
           </button>
         </div>
 
-        {/* Info principal */}
-        <div className="px-6 py-6">
-          <h1 className="text-3xl font-bold">{game.title}</h1>
-
-          <div className="flex items-center gap-2 mt-2">
-            <StarRating value={average} />
-            <span className="text-gray-400 text-sm">
-              {average.toFixed(1)} ({totalReviews.toLocaleString("es-AR")} reseñas)
-            </span>
+        {/* Imagen + info principal */}
+        <div className="grid md:grid-cols-2 gap-8 px-6 py-6">
+          <div>
+            <div className="w-full h-[300px] md:h-[420px] rounded-xl mb-3 overflow-hidden bg-black/40">
+              <img
+                src={game.images[mainImage]}
+                alt={game.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {game.images.map((src, i) => (
+                <button
+                  key={i}
+                  onClick={() => setMainImage(i)}
+                  className={`h-20 rounded-lg border-2 overflow-hidden transition-colors ${
+                    mainImage === i
+                      ? "border-green-500"
+                      : "border-transparent opacity-70 hover:opacity-100"
+                  }`}
+                  aria-label={`Ver imagen ${i + 1}`}
+                >
+                  <img src={src} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
           </div>
 
-          <p className="text-3xl font-bold mt-3">$ {currency(game.price)}</p>
+          <div className="flex flex-col gap-4">
+            <h1 className="text-3xl font-bold">{game.title}</h1>
 
-          <div className="flex flex-col gap-3 max-w-xs mt-4">
-            <button
-              onClick={handleAddToCart}
-              disabled={cartStatus === "added"}
-              className={`flex items-center justify-center gap-2 rounded-lg py-3 font-semibold uppercase text-sm tracking-wide text-white transition-colors ${
-                cartStatus === "added"
-                  ? "bg-green-700"
-                  : "bg-green-600 hover:bg-green-500"
-              }`}
-            >
-              {cartStatus === "added" ? (
-                <>
-                  <FaCheck /> Agregado al carrito
-                </>
-              ) : (
-                <>
-                  <FaShoppingCart /> Agregar al carrito
-                </>
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <StarRating value={average} />
+              <span className="text-gray-400 text-sm">
+                {average.toFixed(1)} ({totalReviews.toLocaleString("es-AR")}{" "}
+                reseñas)
+              </span>
+            </div>
 
-            <button
-              onClick={() => setIsWishlisted((v) => !v)}
-              className="flex items-center justify-center gap-2 rounded-lg py-3 font-semibold uppercase text-sm tracking-wide border border-white/25 hover:bg-white/5 transition-colors"
-            >
-              {isWishlisted ? (
-                <>
-                  <FaHeart className="text-green-500" /> En tu wishlist
-                </>
-              ) : (
-                <>
-                  <FaRegHeart /> Agregar a wishlist
-                </>
-              )}
-            </button>
-          </div>
+            <p className="text-3xl font-bold">$ {currency(game.price)}</p>
 
-          <div className="mt-4 space-y-1 text-sm">
-            <p>
-              <span className="text-gray-400">Categoría: </span>
-              {game.category}
-            </p>
-            <p>
-              <span className="text-gray-400">Desarrollador: </span>
-              {game.developer}
-            </p>
-            <p>
-              <span className="text-gray-400">Lanzamiento: </span>
-              {game.releaseDate}
-            </p>
+            <div className="flex flex-col gap-3 max-w-xs">
+              <button
+                onClick={handleAddToCart}
+                disabled={cartStatus === "added"}
+                className={`flex items-center justify-center gap-2 rounded-lg py-3 font-semibold uppercase text-sm tracking-wide text-white transition-all shadow-[0_4px_16px_rgba(34,197,94,0.35)] ${
+                  cartStatus === "added"
+                    ? "bg-gradient-to-b from-[#15803d] to-[#0f6b30]"
+                    : "bg-gradient-to-b from-[#4ade80] to-[#16a34a] hover:from-[#5eeb92] hover:to-[#1bb84f] hover:shadow-[0_4px_20px_rgba(34,197,94,0.55)]"
+                }`}
+              >
+                {cartStatus === "added" ? (
+                  <>
+                    <FaCheck /> Agregado al carrito
+                  </>
+                ) : (
+                  <>
+                    <FaShoppingCart /> Agregar al carrito
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={() => setIsWishlisted((v) => !v)}
+                className="flex items-center justify-center gap-2 rounded-lg py-3 font-semibold uppercase text-sm tracking-wide border border-white/25 hover:bg-white/5 transition-colors"
+              >
+                {isWishlisted ? (
+                  <>
+                    <FaHeart className="text-green-500" /> En tu wishlist
+                  </>
+                ) : (
+                  <>
+                    <FaRegHeart /> Agregar a wishlist
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="mt-2 space-y-1 text-sm">
+              <p>
+                <span className="text-gray-400">Categoría: </span>
+                {game.category}
+              </p>
+              <p>
+                <span className="text-gray-400">Desarrollador: </span>
+                {game.developer}
+              </p>
+              <p>
+                <span className="text-gray-400">Lanzamiento: </span>
+                {game.releaseDate}
+              </p>
+            </div>
           </div>
         </div>
 
