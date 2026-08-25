@@ -1,6 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaStar, FaTimes, FaChevronRight } from "react-icons/fa";
+import {
+  FaStar,
+  FaShoppingCart,
+  FaHeart,
+  FaRegHeart,
+  FaCheck,
+  FaTimes,
+  FaChevronRight,
+} from "react-icons/fa";
 
 // Datos de ejemplo. Reemplazá esto por los datos reales del juego
 // (por ejemplo obtenidos por fetch/useParams cuando conectes tu API/backend).
@@ -19,6 +27,14 @@ const currency = (n) => n.toLocaleString("es-AR", { minimumFractionDigits: 0 });
 const DetalleJuego = () => {
   const navigate = useNavigate();
   const game = gameData;
+
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [cartStatus, setCartStatus] = useState("idle"); // idle | added
+
+  const handleAddToCart = () => {
+    setCartStatus("added");
+    setTimeout(() => setCartStatus("idle"), 1800);
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0c] text-gray-100 py-6 px-4">
@@ -59,6 +75,43 @@ const DetalleJuego = () => {
           </div>
 
           <p className="text-3xl font-bold mt-3">$ {currency(game.price)}</p>
+
+          <div className="flex flex-col gap-3 max-w-xs mt-4">
+            <button
+              onClick={handleAddToCart}
+              disabled={cartStatus === "added"}
+              className={`flex items-center justify-center gap-2 rounded-lg py-3 font-semibold uppercase text-sm tracking-wide text-white transition-colors ${
+                cartStatus === "added"
+                  ? "bg-green-700"
+                  : "bg-green-600 hover:bg-green-500"
+              }`}
+            >
+              {cartStatus === "added" ? (
+                <>
+                  <FaCheck /> Agregado al carrito
+                </>
+              ) : (
+                <>
+                  <FaShoppingCart /> Agregar al carrito
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={() => setIsWishlisted((v) => !v)}
+              className="flex items-center justify-center gap-2 rounded-lg py-3 font-semibold uppercase text-sm tracking-wide border border-white/25 hover:bg-white/5 transition-colors"
+            >
+              {isWishlisted ? (
+                <>
+                  <FaHeart className="text-green-500" /> En tu wishlist
+                </>
+              ) : (
+                <>
+                  <FaRegHeart /> Agregar a wishlist
+                </>
+              )}
+            </button>
+          </div>
 
           <div className="mt-4 space-y-1 text-sm">
             <p>
