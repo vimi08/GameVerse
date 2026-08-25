@@ -1,10 +1,11 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaGamepad, FaSearch, FaBell, FaGlobe } from "react-icons/fa";
+import { useAppContext } from "../context/AppContext";
 
 const Navbar = () => {
-  const location = useLocation();
-
+ const location = useLocation();
+  const { user, logout } = useAppContext();
   const isCurrentPath = (path) => location.pathname === path;
 
   return (
@@ -72,25 +73,39 @@ const Navbar = () => {
             <FaSearch className="absolute right-3 text-slate-400 text-xs" />
           </div>
 
-          <button title="Idioma" className="text-slate-400 hover:text-white p-2 text-sm hidden sm:block">
+          <button
+            title="Idioma"
+            className="text-slate-400 hover:text-white p-2 text-sm hidden sm:block"
+          >
             <FaGlobe />
           </button>
 
-          <button title="Notificaciones" className="relative text-slate-400 hover:text-white p-2 text-sm hidden sm:block">
+          <button
+            title="Notificaciones"
+            className="relative text-slate-400 hover:text-white p-2 text-sm hidden sm:block"
+          >
             <FaBell />
             <span className="absolute top-1 right-1 w-2 h-2 bg-accent-green rounded-full" />
           </button>
 
-          <Link
-            to="/login"
-            className="bg-accent-green hover:bg-accent-green-hover text-white font-bold uppercase text-xs sm:text-sm px-5 py-2.5 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-0.5"
-          >
-            INICIAR SESIÓN
-          </Link>
+          {user ? (
+            <button
+              onClick={() => logout("/")} 
+              className="bg-red-500 hover:bg-red-600 text-white font-bold uppercase text-xs sm:text-sm px-5 py-2.5 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-0.5"
+            >
+              CERRAR SESIÓN
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-accent-green hover:bg-accent-green-hover text-white font-bold uppercase text-xs sm:text-sm px-5 py-2.5 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-0.5"
+            >
+              INICIAR SESIÓN
+            </Link>
+          )}
         </div>
       </div>
     </header>
   );
 };
-
 export default Navbar;
