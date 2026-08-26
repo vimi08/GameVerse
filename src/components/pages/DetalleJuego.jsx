@@ -11,9 +11,9 @@ import {
   FaTimes,
   FaChevronRight,
 } from "react-icons/fa";
-import gow1 from "../../assets/juego/god_of_war_1.avif";
-import gow2 from "../../assets/juego/god_of_war_2.jpg";
-import gow3 from "../../assets/juego/god_of_war_3.jpg";
+import gow1 from "../../assets/god_of_war_1.avif";
+import gow2 from "../../assets/god_of_war_2.jpg";
+import gow3 from "../../assets/god_of_war_3.jpg";
 
 // Datos de ejemplo. Reemplazá esto por los datos reales del juego
 // (por ejemplo obtenidos por fetch/useParams cuando conectes tu API/backend).
