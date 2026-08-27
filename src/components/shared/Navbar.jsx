@@ -14,7 +14,7 @@ import { useAppContext } from "../context/AppContext";
 
 const Navbar = () => {
   const location = useLocation();
-  const { user, logout } = useAppContext();
+  const { user, logout, wishlist } = useAppContext();
   const isCurrentPath = (path) => location.pathname === path;
 
   return (
