@@ -12,6 +12,7 @@ const CardGamer = ({ juego, onAddToCart }) => {
         <img
           src={juego.imagen}
           alt={juego.titulo}
+          referrerPolicy="no-referrer"
           onError={(e) => {
             e.target.onerror = null;
             e.target.src =

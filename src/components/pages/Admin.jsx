@@ -22,6 +22,43 @@ const CATEGORIAS = [
   "Simulación",
 ];
 
+const normalizarUrlImagen = (rawUrl) => {
+  if (!rawUrl) return "";
+  let url = rawUrl.trim();
+
+  if (url.includes("drive.google.com") && url.includes("/file/d/")) {
+    const match = url.match(/\/file\/d\/([^\/]+)/);
+    if (match && match[1]) {
+      return `https://lh3.googleusercontent.com/d/${match[1]}`;
+    }
+  }
+
+  if (url.includes("google.com/imgres") || url.includes("google.com/url")) {
+    try {
+      const parsed = new URL(url);
+      const imgurl =
+        parsed.searchParams.get("imgurl") || parsed.searchParams.get("url");
+      if (imgurl) return imgurl;
+    } catch {}
+  }
+
+  if (url.includes("dropbox.com")) {
+    return url.replace("dl=0", "raw=1");
+  }
+
+  if (
+    url.includes("imgur.com") &&
+    !url.includes("i.imgur.com") &&
+    !url.includes("data:image")
+  ) {
+    const parts = url.split("/");
+    const id = parts[parts.length - 1].split("?")[0].split(".")[0];
+    if (id) return `https://i.imgur.com/${id}.png`;
+  }
+
+  return url;
+};
+
 const juegoInicial = {
   titulo: "",
   categoria: "",
@@ -118,11 +155,42 @@ const Admin = () => {
 
   const manejarCambio = (event) => {
     const { name, value, type, checked } = event.target;
+    let valorFinal = type === "checkbox" ? checked : value;
+
+    if (name === "imagen" && typeof valorFinal === "string") {
+      valorFinal = normalizarUrlImagen(valorFinal);
+    }
 
     setFormulario((actual) => ({
       ...actual,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: valorFinal,
     }));
+  };
+
+  const manejarSubidaArchivoImagen = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire({
+        icon: "warning",
+        title: "Archivo muy grande",
+        text: "La imagen no debe superar los 5MB.",
+        background: "#171a21",
+        color: "#fff",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Url = event.target.result;
+      setFormulario((actual) => ({
+        ...actual,
+        imagen: base64Url,
+      }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const guardarJuego = (event) => {
@@ -509,16 +577,61 @@ const Admin = () => {
           placeholder="Ej: CD Projekt Red"
           required
         />
-        <div className="md:col-span-2">
-          <AdminInput
-            label="URL o enlace de imagen"
-            name="imagen"
-            type="text"
-            value={formulario.imagen}
-            onChange={manejarCambio}
-            placeholder="Pegá cualquier enlace de imagen (ej: https://..., data:image/..., etc.)"
-            required
-          />
+        <div className="md:col-span-2 space-y-3 bg-neutral/40 p-4 rounded-xl border border-secondary/40">
+          <label className="block text-sm font-semibold text-slate-200">
+            Imagen del juego (URL o archivo local) *
+          </label>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <span className="text-xs text-slate-400 block mb-1">Opción A: Pegar enlace/URL</span>
+              <input
+                name="imagen"
+                type="text"
+                value={formulario.imagen}
+                onChange={manejarCambio}
+                placeholder="Pegá cualquier enlace de imagen (http, https, Drive, etc.)"
+                required={!formulario.imagen}
+                className="w-full rounded-xl border border-secondary bg-neutral px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-accent-green"
+              />
+            </div>
+            <div>
+              <span className="text-xs text-slate-400 block mb-1">Opción B: Subir desde tu equipo</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={manejarSubidaArchivoImagen}
+                className="w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-accent-green file:text-white hover:file:bg-accent-green-hover cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* VISTA PREVIA EN TIEMPO REAL */}
+          {formulario.imagen && (
+            <div className="mt-3 flex items-center gap-4 bg-tertiary p-3 rounded-xl border border-secondary/50">
+              <img
+                src={formulario.imagen}
+                alt="Vista previa del juego"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80";
+                }}
+                className="h-20 w-32 object-cover rounded-lg border border-secondary shadow shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold text-accent-green">✓ Vista previa de la imagen cargada</p>
+                <p className="text-[11px] text-slate-400 mt-0.5 truncate">{formulario.imagen}</p>
+                <button
+                  type="button"
+                  onClick={() => setFormulario((prev) => ({ ...prev, imagen: "" }))}
+                  className="text-xs text-red-400 hover:underline mt-1 block font-semibold"
+                >
+                  Quitar imagen
+                </button>
+              </div>
+            </div>
+          )}
         </div>
         <div className="md:col-span-2">
           <label className="mb-2 block text-sm font-semibold text-slate-200">
