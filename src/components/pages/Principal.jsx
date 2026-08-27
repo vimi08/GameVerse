@@ -18,12 +18,17 @@ const Principal = () => {
   };
 
   // Filtrar juegos según la búsqueda por nombre y la categoría seleccionada
-  const juegosFiltrados = juegos.filter((juego) => {
-    const coincideNombre = juego.titulo
+  const listaJuegos = Array.isArray(juegos) ? juegos : [];
+  const juegosFiltrados = listaJuegos.filter((juego) => {
+    if (!juego) return false;
+    const titulo = String(juego.titulo ?? "");
+    const categoria = String(juego.categoria ?? "");
+
+    const coincideNombre = titulo
       .toLowerCase()
       .includes(busqueda.toLowerCase().trim());
     const coincideCategoria = categoriaSeleccionada
-      ? juego.categoria.toLowerCase() === categoriaSeleccionada.toLowerCase()
+      ? categoria.toLowerCase() === categoriaSeleccionada.toLowerCase()
       : true;
 
     return coincideNombre && coincideCategoria;

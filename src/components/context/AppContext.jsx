@@ -32,9 +32,11 @@ export function AppProvider({ children }) {
     }
   }, [user]);
   // WISHLIST
-  const [wishlist, setWishlist] = useState(() =>
-    safeParseLocal("wishlistKey", []),
-  );
+  const [wishlist, setWishlist] = useState(() => {
+    const parseado = safeParseLocal("wishlistKey", []);
+    return Array.isArray(parseado) ? parseado : [];
+  });
+
   useEffect(() => {
     localStorage.setItem("wishlistKey", JSON.stringify(wishlist));
   }, [wishlist]);
@@ -43,25 +45,34 @@ export function AppProvider({ children }) {
   const toggleWishlist = (juego) => {
     if (!juego || !juego.id) return;
     setWishlist((actuales) => {
-      const existe = actuales.some((item) => String(item.id) === String(juego.id));
+      const listaSegura = Array.isArray(actuales) ? actuales : [];
+      const existe = listaSegura.some(
+        (item) => String(item.id) === String(juego.id),
+      );
       if (existe) {
-        return actuales.filter((item) => String(item.id) !== String(juego.id));
+        return listaSegura.filter(
+          (item) => String(item.id) !== String(juego.id),
+        );
       } else {
-        return [...actuales, juego];
+        return [...listaSegura, juego];
       }
     });
   };
 
   const estaEnWishlist = (id) => {
-    if (!id) return false;
+    if (!id || !Array.isArray(wishlist)) return false;
     return wishlist.some((item) => String(item.id) === String(id));
   };
   // JUEGOS
   const [juegos, setJuegos] = useState(() => {
-    const guardados =
-      safeParseLocal("juegosKey", null) || safeParseLocal("juegos", null);
-    if (guardados && Array.isArray(guardados) && guardados.length > 0) {
-      return guardados;
+    const parseadoKey = safeParseLocal("juegosKey", null);
+    const parseadoJuegos = safeParseLocal("juegos", null);
+
+    if (Array.isArray(parseadoKey) && parseadoKey.length > 0) {
+      return parseadoKey;
+    }
+    if (Array.isArray(parseadoJuegos) && parseadoJuegos.length > 0) {
+      return parseadoJuegos;
     }
     return juegosIniciales;
   });

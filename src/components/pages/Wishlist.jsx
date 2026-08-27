@@ -7,6 +7,7 @@ import BeneficiosBar from "../services/BeneficiosBar";
 
 const Wishlist = () => {
   const { wishlist, setWishlist } = useAppContext();
+  const listaWishlist = Array.isArray(wishlist) ? wishlist : [];
 
   const vaciarWishlist = () => {
     setWishlist([]);
@@ -31,10 +32,10 @@ const Wishlist = () => {
             </p>
           </div>
 
-          {wishlist.length > 0 && (
+          {listaWishlist.length > 0 && (
             <div className="flex items-center gap-3 self-start md:self-auto">
               <span className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wider">
-                {wishlist.length} {wishlist.length === 1 ? "Juego guardado" : "Juegos guardados"}
+                {listaWishlist.length} {listaWishlist.length === 1 ? "Juego guardado" : "Juegos guardados"}
               </span>
 
               <button
@@ -51,9 +52,9 @@ const Wishlist = () => {
       </section>
 
       {/* Grilla de Juegos en Wishlist */}
-      {wishlist.length > 0 ? (
+      {listaWishlist.length > 0 ? (
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
-          {wishlist.map((juego) => (
+          {listaWishlist.map((juego) => (
             <CardGamer key={juego.id} juego={juego} />
           ))}
         </section>
