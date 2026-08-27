@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+:root {
+  --primary: #66c0f4;
+  --secondary: #2a475e;
+  --tertiary: #1b2838;
+  --neutral: #171a21;
+  --accent-green: #76b82a;
+  --accent-green-hover: #65a30d;
+}
+
+@theme {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-neutral: var(--neutral);
+  --color-accent-green: var(--accent-green);
+  --color-accent-green-hover: var(--accent-green-hover);
+}
+
+body {
+  background-color: #171a21;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
