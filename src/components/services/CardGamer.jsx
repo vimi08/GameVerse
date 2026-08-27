@@ -1,17 +1,45 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaHeart, FaRegHeart } from "react-icons/fa";
+import { useAppContext } from "../context/AppContext";
 
 const CardGamer = ({ juego, onAddToCart }) => {
+  const { toggleWishlist, estaEnWishlist } = useAppContext();
   if (!juego) return null;
 
+  const enWishlist = estaEnWishlist(juego.id);
+
   return (
-    <article className="bg-tertiary border border-secondary/40 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 flex flex-col justify-between group">
+    <article className="bg-tertiary border border-secondary/40 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1 flex flex-col justify-between group relative">
+      {/* Botón de Favorito / Wishlist en la esquina superior derecha */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleWishlist(juego);
+        }}
+        title={enWishlist ? "Quitar de la lista de deseos" : "Agregar a la lista de deseos"}
+        className="absolute top-3 right-3 z-10 bg-neutral/80 hover:bg-neutral text-white p-2 rounded-full backdrop-blur-md border border-secondary/50 shadow-md transition duration-200 transform active:scale-90"
+      >
+        {enWishlist ? (
+          <FaHeart className="text-red-500 text-sm" />
+        ) : (
+          <FaRegHeart className="text-slate-300 hover:text-red-400 text-sm" />
+        )}
+      </button>
+
       {/* Enlace a la imagen de portada */}
       <Link to={`/detalle/${juego.id}`} className="relative block overflow-hidden aspect-[4/3] bg-neutral">
         <img
           src={juego.imagen}
           alt={juego.titulo}
+          referrerPolicy="no-referrer"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src =
+              "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80";
+          }}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-tertiary via-transparent to-transparent opacity-60" />

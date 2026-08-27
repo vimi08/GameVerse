@@ -6,6 +6,8 @@ import DetalleJuego from "./components/pages/DetalleJuego";
 import Equipo from "./components/pages/Equipo";
 import Error404 from "./components/pages/Error404";
 import Principal from "./components/pages/Principal";
+import Catalogo from "./components/pages/Catalogo";
+import Wishlist from "./components/pages/Wishlist";
 
 // Componentes compartidos
 import Footer from "./components/shared/Footer";
@@ -27,6 +29,8 @@ function App() {
           <main className="grow container mx-auto p-4">
             <Routes>
               <Route path="/" element={<Principal />} />
+              <Route path="/catalogo" element={<Catalogo />} />
+              <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/login" element={<Acceso />} />
               <Route path="/registro" element={<Registro />} />
               <Route path="/detalle/:id" element={<DetalleJuego />} />

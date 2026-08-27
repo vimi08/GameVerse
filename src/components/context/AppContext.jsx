@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { juegosIniciales } from "../../data/juegos";
 
 export const AppContext = createContext(undefined);
 
@@ -31,16 +32,54 @@ export function AppProvider({ children }) {
     }
   }, [user]);
   // WISHLIST
-  const [wishlist, setWishlist] = useState(() =>
-    safeParseLocal("wishlistKey", []),
-  );
+  const [wishlist, setWishlist] = useState(() => {
+    const parseado = safeParseLocal("wishlistKey", []);
+    return Array.isArray(parseado) ? parseado : [];
+  });
+
   useEffect(() => {
     localStorage.setItem("wishlistKey", JSON.stringify(wishlist));
   }, [wishlist]);
+
+  // FUNCIONES DE WISHLIST
+  const toggleWishlist = (juego) => {
+    if (!juego || !juego.id) return;
+    setWishlist((actuales) => {
+      const listaSegura = Array.isArray(actuales) ? actuales : [];
+      const existe = listaSegura.some(
+        (item) => String(item.id) === String(juego.id),
+      );
+      if (existe) {
+        return listaSegura.filter(
+          (item) => String(item.id) !== String(juego.id),
+        );
+      } else {
+        return [...listaSegura, juego];
+      }
+    });
+  };
+
+  const estaEnWishlist = (id) => {
+    if (!id || !Array.isArray(wishlist)) return false;
+    return wishlist.some((item) => String(item.id) === String(id));
+  };
   // JUEGOS
-  const [juegos, setJuegos] = useState(() => safeParseLocal("juegosKey", []));
+  const [juegos, setJuegos] = useState(() => {
+    const parseadoKey = safeParseLocal("juegosKey", null);
+    const parseadoJuegos = safeParseLocal("juegos", null);
+
+    if (Array.isArray(parseadoKey) && parseadoKey.length > 0) {
+      return parseadoKey;
+    }
+    if (Array.isArray(parseadoJuegos) && parseadoJuegos.length > 0) {
+      return parseadoJuegos;
+    }
+    return juegosIniciales;
+  });
+
   useEffect(() => {
     localStorage.setItem("juegosKey", JSON.stringify(juegos));
+    localStorage.setItem("juegos", JSON.stringify(juegos));
   }, [juegos]);
   // AGREGAR JUEGO
   const agregarJuego = (nuevoJuego) => {
@@ -76,6 +115,8 @@ export function AppProvider({ children }) {
 
     wishlist,
     setWishlist,
+    toggleWishlist,
+    estaEnWishlist,
 
     juegos,
     setJuegos,
