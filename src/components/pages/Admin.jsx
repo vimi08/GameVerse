@@ -26,34 +26,56 @@ const normalizarUrlImagen = (rawUrl) => {
   if (!rawUrl) return "";
   let url = rawUrl.trim();
 
-  if (url.includes("drive.google.com") && url.includes("/file/d/")) {
-    const match = url.match(/\/file\/d\/([^\/]+)/);
-    if (match && match[1]) {
-      return `https://lh3.googleusercontent.com/d/${match[1]}`;
+  try {
+    // 1. Extraer imagen directa de Bing Images (mediaurl)
+    if (url.includes("bing.com/images")) {
+      const match = url.match(/(?:mediaurl|mediaUrl|imgurl)=([^&]+)/i);
+      if (match && match[1]) {
+        return decodeURIComponent(match[1]);
+      }
     }
-  }
 
-  if (url.includes("google.com/imgres") || url.includes("google.com/url")) {
-    try {
-      const parsed = new URL(url);
-      const imgurl =
-        parsed.searchParams.get("imgurl") || parsed.searchParams.get("url");
-      if (imgurl) return imgurl;
-    } catch {}
-  }
+    // 2. Extraer imagen directa de Google Images (imgurl / url)
+    if (url.includes("google.com/imgres") || url.includes("google.com/url")) {
+      const match = url.match(/(?:imgurl|url)=([^&]+)/i);
+      if (match && match[1]) {
+        return decodeURIComponent(match[1]);
+      }
+    }
 
-  if (url.includes("dropbox.com")) {
-    return url.replace("dl=0", "raw=1");
-  }
+    // 3. Extraer imagen directa de Yahoo Images
+    if (url.includes("images.search.yahoo.com")) {
+      const match = url.match(/(?:imgurl|url)=([^&]+)/i);
+      if (match && match[1]) {
+        return decodeURIComponent(match[1]);
+      }
+    }
 
-  if (
-    url.includes("imgur.com") &&
-    !url.includes("i.imgur.com") &&
-    !url.includes("data:image")
-  ) {
-    const parts = url.split("/");
-    const id = parts[parts.length - 1].split("?")[0].split(".")[0];
-    if (id) return `https://i.imgur.com/${id}.png`;
+    // 4. Convertir enlaces de Google Drive
+    if (url.includes("drive.google.com") && url.includes("/file/d/")) {
+      const match = url.match(/\/file\/d\/([^\/]+)/);
+      if (match && match[1]) {
+        return `https://lh3.googleusercontent.com/d/${match[1]}`;
+      }
+    }
+
+    // 5. Convertir enlaces de Dropbox
+    if (url.includes("dropbox.com")) {
+      return url.replace("dl=0", "raw=1");
+    }
+
+    // 6. Convertir enlaces de páginas Imgur a imagen directa .png
+    if (
+      url.includes("imgur.com") &&
+      !url.includes("i.imgur.com") &&
+      !url.includes("data:image")
+    ) {
+      const parts = url.split("/");
+      const id = parts[parts.length - 1].split("?")[0].split(".")[0];
+      if (id) return `https://i.imgur.com/${id}.png`;
+    }
+  } catch (err) {
+    console.error("Error al extraer URL de imagen", err);
   }
 
   return url;
@@ -589,10 +611,28 @@ const Admin = () => {
                 type="text"
                 value={formulario.imagen}
                 onChange={manejarCambio}
-                placeholder="Pegá cualquier enlace de imagen (http, https, Drive, etc.)"
+                onBlur={(e) => {
+                  const normalizada = normalizarUrlImagen(e.target.value);
+                  if (normalizada !== formulario.imagen) {
+                    setFormulario((prev) => ({ ...prev, imagen: normalizada }));
+                  }
+                }}
+                onPaste={(e) => {
+                  const textoPegado = e.clipboardData.getData("text");
+                  const normalizada = normalizarUrlImagen(textoPegado);
+                  if (normalizada) {
+                    setTimeout(() => {
+                      setFormulario((prev) => ({ ...prev, imagen: normalizada }));
+                    }, 50);
+                  }
+                }}
+                placeholder="Pegá cualquier enlace de imagen (Bing, Google, Unsplash, etc.)"
                 required={!formulario.imagen}
                 className="w-full rounded-xl border border-secondary bg-neutral px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-accent-green"
               />
+              <span className="text-[11px] text-slate-400 block mt-1">
+                💡 En Google/Bing: hacé clic derecho en la imagen y elegí <strong>"Copiar dirección de la imagen"</strong>.
+              </span>
             </div>
             <div>
               <span className="text-xs text-slate-400 block mb-1">Opción B: Subir desde tu equipo</span>
