@@ -38,6 +38,24 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem("wishlistKey", JSON.stringify(wishlist));
   }, [wishlist]);
+
+  // FUNCIONES DE WISHLIST
+  const toggleWishlist = (juego) => {
+    if (!juego || !juego.id) return;
+    setWishlist((actuales) => {
+      const existe = actuales.some((item) => String(item.id) === String(juego.id));
+      if (existe) {
+        return actuales.filter((item) => String(item.id) !== String(juego.id));
+      } else {
+        return [...actuales, juego];
+      }
+    });
+  };
+
+  const estaEnWishlist = (id) => {
+    if (!id) return false;
+    return wishlist.some((item) => String(item.id) === String(id));
+  };
   // JUEGOS
   const [juegos, setJuegos] = useState(() => {
     const guardados =
@@ -86,6 +104,8 @@ export function AppProvider({ children }) {
 
     wishlist,
     setWishlist,
+    toggleWishlist,
+    estaEnWishlist,
 
     juegos,
     setJuegos,

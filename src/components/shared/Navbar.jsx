@@ -58,10 +58,19 @@ const Navbar = () => {
             CATÁLOGO
           </Link>
           <Link
-            to="/"
-            className="text-slate-300 hover:text-white pb-1 transition duration-200"
+            to="/wishlist"
+            className={`pb-1 transition duration-200 flex items-center gap-1.5 ${
+              isCurrentPath("/wishlist")
+                ? "text-white border-b-2 border-accent-green"
+                : "text-slate-300 hover:text-white"
+            }`}
           >
-            WISHLIST
+            <span>WISHLIST</span>
+            {wishlist && wishlist.length > 0 && (
+              <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                {wishlist.length}
+              </span>
+            )}
           </Link>
           <Link
             to="/equipo"

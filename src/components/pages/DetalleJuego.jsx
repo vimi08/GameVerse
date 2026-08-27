@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   FaStar,
   FaShoppingCart,
@@ -11,13 +11,15 @@ import {
   FaTimes,
   FaChevronRight,
 } from "react-icons/fa";
+import { useAppContext } from "../context/AppContext";
+import Error404 from "./Error404";
 import gow1 from "../../assets/god_of_war_1.avif";
 import gow2 from "../../assets/god_of_war_2.jpg";
 import gow3 from "../../assets/god_of_war_3.jpg";
 
-// Datos de ejemplo. Reemplazá esto por los datos reales del juego
-// (por ejemplo obtenidos por fetch/useParams cuando conectes tu API/backend).
+// Datos de ejemplo para God of War
 const gameData = {
+  id: "god-of-war",
   title: "God of War Ragnarök",
   category: "Aventura",
   developer: "Santa Monica Studio",
@@ -66,8 +68,6 @@ const initialReviews = [
 
 const currency = (n) => n.toLocaleString("es-AR", { minimumFractionDigits: 0 });
 
-// Estrellas: soporta valores decimales (ej. 4.8), calculando el relleno
-// estrella por estrella (evita bugs de relleno con ratings bajos).
 const StarRating = ({ value, size = 16 }) => {
   const safeValue = Math.max(0, Math.min(5, value || 0));
   return (
@@ -90,7 +90,6 @@ const StarRating = ({ value, size = 16 }) => {
   );
 };
 
-// Selector de estrellas clickeable, usado al escribir una reseña
 const StarInput = ({ value, onChange }) => {
   const [hover, setHover] = useState(0);
   return (
@@ -120,8 +119,41 @@ const TABS = [
 ];
 
 const DetalleJuego = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const game = gameData;
+  const { juegos, toggleWishlist, estaEnWishlist } = useAppContext();
+
+  // Buscar el juego en los datos almacenados
+  const juegoActual = useMemo(() => {
+    if (!id) return null;
+    return juegos.find((j) => String(j.id) === String(id));
+  }, [juegos, id]);
+
+  // REGLA: Todos los juegos excepto God of War llevan al Error 404
+  const esGodOfWar = useMemo(() => {
+    if (!id) return false;
+    if (String(id).toLowerCase().includes("god-of-war") || id === "gow") return true;
+    if (!juegoActual) return false;
+    return String(juegoActual.titulo || "").toLowerCase().includes("god of war");
+  }, [juegoActual, id]);
+
+  // Si no es God of War, renderizamos la vista de Error 404
+  if (!esGodOfWar) {
+    return <Error404 />;
+  }
+
+  const game = juegoActual
+    ? {
+        ...gameData,
+        id: juegoActual.id,
+        title: juegoActual.titulo || gameData.title,
+        price: juegoActual.precio || gameData.price,
+        category: juegoActual.categoria || gameData.category,
+        description: juegoActual.descripcion || gameData.description,
+        developer: juegoActual.desarrollador || gameData.developer,
+        images: juegoActual.imagen ? [juegoActual.imagen, gow2, gow3] : gameData.images,
+      }
+    : gameData;
 
   const [activeTab, setActiveTab] = useState("descripcion");
   const [mainImage, setMainImage] = useState(0);
@@ -284,12 +316,12 @@ const DetalleJuego = () => {
               </button>
 
               <button
-                onClick={() => setIsWishlisted((v) => !v)}
+                onClick={() => toggleWishlist(game)}
                 className="flex items-center justify-center gap-2 rounded-lg py-3 font-semibold uppercase text-sm tracking-wide border border-white/25 hover:bg-white/5 transition-colors"
               >
-                {isWishlisted ? (
+                {estaEnWishlist(game.id) ? (
                   <>
-                    <FaHeart className="text-green-500" /> En tu wishlist
+                    <FaHeart className="text-red-500" /> En tu wishlist
                   </>
                 ) : (
                   <>
