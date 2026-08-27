@@ -145,15 +145,7 @@ export default function AboutPage() {
         className="relative bg-gray-900/50 backdrop-blur-lg py-20 px-6 bg-cover bg-center"
         style={{ backgroundImage: `url(${fondoVerde})` }}
       >
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Sobre Nosotros</h2>
-          <p className="text-gray-300 max-w-3xl mx-auto mb-12">
-            Bienvenido a Ecommerce Gamer, tu tienda dedicada a todo lo
-            relacionado con los videojuegos. Creada por un equipo de apasionados
-            del gaming y la tecnología, nació con la visión de ofrecer una
-            plataforma confiable y moderna para todos los jugadores.
-          </p>
-        </div>
+      
         {/* EQUIPO */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {team.map((member) => (
