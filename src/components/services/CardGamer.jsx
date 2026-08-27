@@ -12,6 +12,11 @@ const CardGamer = ({ juego, onAddToCart }) => {
         <img
           src={juego.imagen}
           alt={juego.titulo}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src =
+              "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80";
+          }}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-tertiary via-transparent to-transparent opacity-60" />

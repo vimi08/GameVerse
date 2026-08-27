@@ -511,12 +511,12 @@ const Admin = () => {
         />
         <div className="md:col-span-2">
           <AdminInput
-            label="URL de imagen"
+            label="URL o enlace de imagen"
             name="imagen"
-            type="url"
+            type="text"
             value={formulario.imagen}
             onChange={manejarCambio}
-            placeholder="https://..."
+            placeholder="Pegá cualquier enlace de imagen (ej: https://..., data:image/..., etc.)"
             required
           />
         </div>
