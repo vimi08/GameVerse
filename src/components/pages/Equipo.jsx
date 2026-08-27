@@ -191,7 +191,7 @@ export default function AboutPage() {
           <h3 className="text-2xl font-medium text-white text-center mb-8">
             Nuestros Valores
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-3">
             {values.map((value, index) => (
               <div
                 key={index}
