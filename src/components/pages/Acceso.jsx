@@ -57,7 +57,7 @@ export default function Acceso() {
       navigate("/");
       return;
     }
-    // 3. Si no coincide con ninguno → redirigir a registro
+    // 3. Si no coincide con ninguno → redirigir a registro..
     Swal.fire({
       icon: "error",
       title: "Ups, no pudimos encontrarte",
