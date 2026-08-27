@@ -27,28 +27,28 @@ export default function AboutPage() {
   const [openChat, setOpenChat] = useState(false);
   const team = [
     {
-      name: "VictoriaPonce",
+      name: "Victoria Ponce",
       role: "Frontend Developer",
       description: "Apasionada por React y la experiencia de usuario.",
       img: victoriaImg,
       github: "https://github.com/vimi08",
     },
     {
-      name: "AgustinMatas",
+      name: "Agustin Matas",
       role: "Backend Developer",
       description: "Fan de Node.js y bases de datos.",
       img: agustinmatasImg,
       github: "https://github.com/agusmatas004",
     },
     {
-      name: "SamuelGallardo",
+      name: "Samuel Gallardo",
       role: "UI/UX Designer",
       description: "Diseña interfaces intuitivas y visualmente atractivas.",
       img: samuelImg,
       github: "https://github.com/samuelgallardo873-lgtm",
     },
     {
-      name: "AgustinBeltran",
+      name: "Agustin Beltran",
       role: "QA Tester",
       description: "Garantiza la calidad y estabilidad del sistema.",
       img: agustibeltranImg,
@@ -140,18 +140,21 @@ export default function AboutPage() {
           cuenta, cada partida importa.
         </p>
       </section>
-      {/* SECCIÓN EQUIPO */}
+      {/* SECCIÓN NOSOTROS */}
       <section
         className="relative bg-gray-900/50 backdrop-blur-lg py-20 px-6 bg-cover bg-center"
         style={{ backgroundImage: `url(${fondoVerde})` }}
       >
         <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Nuestro Equipo</h2>
+          <h2 className="text-4xl font-bold mb-6">Sobre Nosotros</h2>
           <p className="text-gray-300 max-w-3xl mx-auto mb-12">
-            Somos un grupo dinámico de gamers y desarrolladores que compartimos
-            la misma pasión: crear experiencias épicas para nuestra comunidad.
+            Bienvenido a Ecommerce Gamer, tu tienda dedicada a todo lo
+            relacionado con los videojuegos. Creada por un equipo de apasionados
+            del gaming y la tecnología, nació con la visión de ofrecer una
+            plataforma confiable y moderna para todos los jugadores.
           </p>
         </div>
+        {/* EQUIPO */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {team.map((member) => (
             <div
@@ -170,17 +173,7 @@ export default function AboutPage() {
               <p className="text-gray-400 mt-2 text-center text-xs">
                 {member.description}
               </p>
-
-              {/* Enlaces dinámicos */}
               <div className="flex gap-3 mt-3">
-                <a
-                  href={member.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-green-400 text-sm"
-                >
-                  LinkedIn
-                </a>
                 <a
                   href={member.github}
                   target="_blank"
@@ -192,6 +185,33 @@ export default function AboutPage() {
               </div>
             </div>
           ))}
+        </div>
+        {/* SUB-SECCIÓN VALORES */}
+        <div className="max-w-6xl mx-auto mt-20 mb-16">
+          <h3 className="text-2xl font-medium text-white text-center mb-8">
+            Nuestros Valores
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {values.map((value, index) => (
+              <div
+                key={index}
+                className="flex flex-col items-center justify-center 
+                   bg-secondary rounded-lg shadow-md 
+                   hover:scale-105 hover:shadow-lime-400/50 transition duration-300 
+                   p-4 text-center mx-auto w-full max-w-[180px] h-auto"
+              >
+                <div className="text-black text-3xl mb-2 flex-shrink-0">
+                  {value.icon}
+                </div>
+                <h4 className="text-sm font-semibold text-white">
+                  {value.title}
+                </h4>
+                <p className="italic text-green-400 text-xs mt-1 break-words">
+                  {value.quote}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
       {/* SECCIÓN OPORTUNIDADES */}
