@@ -1,10 +1,19 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaGamepad, FaSearch, FaBell, FaGlobe } from "react-icons/fa";
+import {
+  FaGamepad,
+  FaSearch,
+  FaBell,
+  FaGlobe,
+  FaUser,
+  FaUserCircle,
+  FaUserShield,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import { useAppContext } from "../context/AppContext";
 
 const Navbar = () => {
- const location = useLocation();
+  const location = useLocation();
   const { user, logout } = useAppContext();
   const isCurrentPath = (path) => location.pathname === path;
 
@@ -60,10 +69,23 @@ const Navbar = () => {
           >
             ABOUT
           </Link>
+          {user?.rol === "admin" && (
+            <Link
+              to="/admin"
+              className={`pb-1 transition duration-200 flex items-center gap-1.5 ${
+                isCurrentPath("/admin")
+                  ? "text-accent-green border-b-2 border-accent-green"
+                  : "text-amber-400 hover:text-amber-300"
+              }`}
+            >
+              <FaUserShield className="text-sm" />
+              <span>PANEL ADMIN</span>
+            </Link>
+          )}
         </nav>
 
-        {/* BARRA DE BÚSQUEDA Y BOTÓN INICIAR SESIÓN */}
-        <div className="flex items-center gap-4">
+        {/* BARRA DE BÚSQUEDA Y SECCIÓN DE PERFIL / AUTENTICACIÓN */}
+        <div className="flex items-center gap-3">
           <div className="hidden xl:flex items-center relative">
             <input
               type="text"
@@ -89,18 +111,41 @@ const Navbar = () => {
           </button>
 
           {user ? (
-            <button
-              onClick={() => logout("/")} 
-              className="bg-red-500 hover:bg-red-600 text-white font-bold uppercase text-xs sm:text-sm px-5 py-2.5 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-0.5"
-            >
-              CERRAR SESIÓN
-            </button>
+            <div className="flex items-center gap-2">
+              {/* ÍCONO Y BOTÓN DE PERFIL / ADMIN */}
+              <Link
+                to={user.rol === "admin" ? "/admin" : "#"}
+                title={user.email}
+                className="flex items-center gap-2 bg-tertiary/90 hover:bg-tertiary border border-secondary/60 hover:border-accent-green text-white text-xs sm:text-sm font-semibold px-3 py-2 rounded-lg transition duration-200"
+              >
+                {user.rol === "admin" ? (
+                  <FaUserShield className="text-accent-green text-base" />
+                ) : (
+                  <FaUserCircle className="text-accent-green text-base" />
+                )}
+                <span className="hidden sm:inline max-w-[110px] truncate">
+                  {user.email ? user.email.split("@")[0] : "Perfil"}
+                </span>
+              </Link>
+
+              {/* CERRAR SESIÓN */}
+              <button
+                onClick={() => logout("/")}
+                title="Cerrar sesión"
+                className="flex items-center gap-1.5 bg-red-500/90 hover:bg-red-600 text-white font-bold uppercase text-xs px-3 py-2 rounded-lg shadow-md transition duration-200"
+              >
+                <FaSignOutAlt className="text-xs" />
+                <span className="hidden sm:inline">SALIR</span>
+              </button>
+            </div>
           ) : (
             <Link
               to="/login"
-              className="bg-accent-green hover:bg-accent-green-hover text-white font-bold uppercase text-xs sm:text-sm px-5 py-2.5 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-0.5"
+              title="Acceder a tu cuenta"
+              className="flex items-center gap-2 bg-accent-green hover:bg-accent-green-hover text-white font-bold uppercase text-xs sm:text-sm px-4 py-2.5 rounded-lg shadow-md transition duration-200 transform hover:-translate-y-0.5"
             >
-              INICIAR SESIÓN
+              <FaUser className="text-sm" />
+              <span>INICIAR SESIÓN</span>
             </Link>
           )}
         </div>
