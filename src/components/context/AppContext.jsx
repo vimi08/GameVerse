@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { juegosIniciales } from "../../data/juegos";
 
 export const AppContext = createContext(undefined);
 
@@ -38,9 +39,18 @@ export function AppProvider({ children }) {
     localStorage.setItem("wishlistKey", JSON.stringify(wishlist));
   }, [wishlist]);
   // JUEGOS
-  const [juegos, setJuegos] = useState(() => safeParseLocal("juegosKey", []));
+  const [juegos, setJuegos] = useState(() => {
+    const guardados =
+      safeParseLocal("juegosKey", null) || safeParseLocal("juegos", null);
+    if (guardados && Array.isArray(guardados) && guardados.length > 0) {
+      return guardados;
+    }
+    return juegosIniciales;
+  });
+
   useEffect(() => {
     localStorage.setItem("juegosKey", JSON.stringify(juegos));
+    localStorage.setItem("juegos", JSON.stringify(juegos));
   }, [juegos]);
   // AGREGAR JUEGO
   const agregarJuego = (nuevoJuego) => {

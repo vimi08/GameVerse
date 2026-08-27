@@ -1,23 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { FaGamepad, FaSearch, FaTimes } from "react-icons/fa";
-import { obtenerJuegosGuardados } from "../../data/juegos";
+import { useAppContext } from "../context/AppContext";
 import BannerGames from "../services/BannerGames";
 import CardGamer from "../services/CardGamer";
 import CategoriasSection from "../services/CategoriasSection";
 import BeneficiosBar from "../services/BeneficiosBar";
 
 const Principal = () => {
-  const [juegos, setJuegos] = useState([]);
+  const { juegos } = useAppContext();
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("");
   const [busqueda, setBusqueda] = useState("");
 
   const catalogoRef = useRef(null);
-
-  // Cargar juegos al montar la página
-  useEffect(() => {
-    const listaJuegos = obtenerJuegosGuardados();
-    setJuegos(listaJuegos);
-  }, []);
 
   const scrollToCatalogo = () => {
     catalogoRef.current?.scrollIntoView({ behavior: "smooth" });

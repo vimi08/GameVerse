@@ -48,8 +48,12 @@ const Navbar = () => {
             INICIO
           </Link>
           <Link
-            to="/"
-            className="text-slate-300 hover:text-white pb-1 transition duration-200"
+            to="/catalogo"
+            className={`pb-1 transition duration-200 ${
+              isCurrentPath("/catalogo")
+                ? "text-white border-b-2 border-accent-green"
+                : "text-slate-300 hover:text-white"
+            }`}
           >
             CATÁLOGO
           </Link>
